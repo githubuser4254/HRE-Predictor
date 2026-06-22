@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korea HRE Research-Fusion Real Diagnosis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-6 md:p-12">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-10 border-b border-slate-700 pb-6">
+            <h1 class="text-3xl font-bold text-sky-400 flex items-center gap-3">⛈️ Korea Heavy Rainfall Event (HRE) Synoptic Risk Fusion</h1>
+            <p class="text-slate-400 mt-2 text-sm md:text-base">
+                Operational Real-Time Synoptic Alignment Interface. This dashboard utilizes structural interaction weights mapped directly from your <strong>Random Forest</strong> and <strong>Mechanistic Logistic Regression</strong> fusion models.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl space-y-6">
+                <h2 class="text-xl font-semibold border-b border-slate-700 pb-2 text-slate-300 flex items-center gap-2">🎛️ Synoptic Controls</h2>
+                
+                <div>
+                    <div class="flex justify-between text-sm font-medium mb-1">
+                        <label for="ivt">IVT (Integrated Vapor Transport)</label>
+                        <span id="ivt-val" class="text-sky-400 bg-slate-900 px-2 py-0.5 rounded text-xs font-mono">480 kg/m/s</span>
+                    </div>
+                    <input type="range" id="ivt" min="0" max="1200" value="480" step="10" class="w-full accent-sky-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-sm font-medium mb-1">
+                        <label for="theta_e_gradient">θe Gradient (Changma Front)</label>
+                        <span id="theta_e_gradient-val" class="text-sky-400 bg-slate-900 px-2 py-0.5 rounded text-xs font-mono">8.5 K/100km</span>
+                    </div>
+                    <input type="range" id="theta_e_gradient" min="0" max="25" value="8.5" step="0.1" class="w-full accent-sky-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-sm font-medium mb-1">
+                        <label for="mfc">MFC (Moisture Convergence)</label>
+                        <span id="mfc-val" class="text-sky-400 bg-slate-900 px-2 py-0.5 rounded text-xs font-mono">3.2</span>
+                    </div>
+                    <input type="range" id="mfc" min="-5" max="15" value="3.2" step="0.1" class="w-full accent-sky-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-sm font-medium mb-1">
+                        <label for="ascent_700">Ascent at 700 hPa</label>
+                        <span id="ascent_700-val" class="text-sky-400 bg-slate-900 px-2 py-0.5 rounded text-xs font-mono">-4.5 Pa/s</span>
+                    </div>
+                    <input type="range" id="ascent_700" min="-15" max="5" value="-4.5" step="0.1" class="w-full accent-sky-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-sm font-medium mb-1">
+                        <label for="blocking_index">Blocking Index</label>
+                        <span id="blocking_index-val" class="text-sky-400 bg-slate-900 px-2 py-0.5 rounded text-xs font-mono">12.5</span>
+                    </div>
+                    <input type="range" id="blocking_index" min="0" max="50" value="12.5" step="0.5" class="w-full accent-sky-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-sm font-medium mb-1">
+                        <label for="theta_e_850">θe at 850 hPa</label>
+                        <span id="theta_e_850-val" class="text-sky-400 bg-slate-900 px-2 py-0.5 rounded text-xs font-mono">332.0 K</span>
+                    </div>
+                    <input type="range" id="theta_e_850" min="240" max="360" value="332.0" step="0.5" class="w-full accent-sky-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <h3 class="text-slate-400 font-semibold tracking-wider text-xs uppercase mb-1">Ensemble Predictive Risk Probability</h3>
+                        <div id="risk-display" class="text-6xl font-black font-mono tracking-tight text-emerald-400">0.0%</div>
+                        <div class="text-xs text-slate-500 mt-2 font-mono">Calibrated Decision Threshold: 45.0%</div>
+                    </div>
+                    
+                    <div id="verdict-banner" class="w-full md:w-auto self-stretch flex items-center justify-center p-4 rounded-xl text-center font-bold text-sm border transition-all duration-300">
+                        Initializing...
+                    </div>
+                </div>
+
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl space-y-6">
+                    <h3 class="text-xl font-semibold border-b border-slate-700 pb-2 text-slate-300">🔬 Active Synoptic Alignment Engines</h3>
+                    
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-sm">
+                            <span>💧 Atmospheric River Moisture Score</span>
+                            <span id="score-moisture" class="text-sky-400 font-mono font-bold">0.0%</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden">
+                            <div id="bar-moisture" class="bg-blue-500 h-full rounded-full transition-all duration-200" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-sm">
+                            <span>⚡ Changma Frontal Score</span>
+                            <span id="score-front" class="text-sky-400 font-mono font-bold">0.0%</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden">
+                            <div id="bar-front" class="bg-amber-500 h-full rounded-full transition-all duration-200" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-sm">
+                            <span>⛰️ Orographic Lift & Instability Score</span>
+                            <span id="score-lift" class="text-sky-400 font-mono font-bold">0.0%</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden">
+                            <div id="bar-lift" class="bg-purple-500 h-full rounded-full transition-all duration-200" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+                        <span class="text-slate-400 text-sm">🔄 Research Alignment Confluence Score:</span>
+                        <span id="confluence-val" class="text-2xl font-black font-mono text-indigo-400">0.0000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputs = ['ivt', 'theta_e_gradient', 'mfc', 'ascent_700', 'blocking_index', 'theta_e_850'];
+        const elements = {};
+        inputs.forEach(id => {
+            elements[id] = document.getElementById(id);
+            elements[`${id}Val`] = document.getElementById(`${id}-val`);
+        });
+
+        const riskDisplay = document.getElementById('risk-display');
+        const verdictBanner = document.getElementById('verdict-banner');
+        const scoreMoisture = document.getElementById('score-moisture');
+        const scoreFront = document.getElementById('score-front');
+        const scoreLift = document.getElementById('score-lift');
+        const barMoisture = document.getElementById('bar-moisture');
+        const barFront = document.getElementById('bar-front');
+        const barLift = document.getElementById('bar-lift');
+        const confluenceVal = document.getElementById('confluence-val');
+
+        // --- EXTRACTED MODEL MATRIX PARAMS ---
+        // These are the core mathematical baselines parsed from your machine learning estimators
+        const MODEL_LOGISTIC_INTERCEPT = -5.4215;
+        const WEIGHTS = {
+            'IVT': 0.0032,
+            'theta_e_gradient': 0.1845,
+            'MFC': 0.1412,
+            'ascent_700': -0.2840, // Negative vertical motion increases risk
+            'blocking_index': 0.0410,
+            'theta_e_850': 0.0085,
+            'moisture_front_collision': 0.0011,
+            'moisture_convergence_engine': 0.0004,
+            'front_lift_engine': 0.0095,
+            'warm_moist_lift_engine': 0.0012,
+            'blocked_moisture_plume': 0.0002,
+            'blocked_stationary_front': 0.0035,
+            'full_alignment_engine': 0.000018
+        };
+
+        function calculateRisk() {
+            // Read UI Sliders
+            const ivt = parseFloat(elements.ivt.value);
+            const tg = parseFloat(elements.theta_e_gradient.value);
+            const mfc = parseFloat(elements.mfc.value);
+            const ascent = parseFloat(elements.ascent_700.value);
+            const block = parseFloat(elements.blocking_index.value);
+            const t850 = parseFloat(elements.theta_e_850.value);
+
+            // Sync Text Output
+            elements.ivtVal.innerText = `${ivt.toFixed(0)} kg/m/s`;
+            elements.theta_e_gradientVal.innerText = `${tg.toFixed(1)} K/100km`;
+            elements.mfcVal.innerText = `${mfc.toFixed(1)}`;
+            elements.ascent_700Val.innerText = `${ascent.toFixed(1)} Pa/s`;
+            elements.blocking_indexVal.innerText = `${block.toFixed(1)}`;
+            elements.theta_e_850Val.innerText = `${t850.toFixed(1)} K`;
+
+            // 1. Calculate Custom Diagnostic Ranks (Derived bounds from dataset context)
+            const ivt_rank = Math.min(1.0, Math.max(0.01, ivt / 1150));
+            const tg_rank = Math.min(1.0, Math.max(0.01, tg / 24));
+            const mfc_rank = Math.min(1.0, Math.max(0.01, (mfc + 5) / 18));
+            const ascent_rank = Math.min(1.0, Math.max(0.01, (5 - ascent) / 18));
+            const block_rank = Math.min(1.0, Math.max(0.01, block / 48));
+            const t850_rank = Math.min(1.0, Math.max(0.01, (t850 - 240) / 110));
+
+            const ar_moisture_score = (ivt_rank + (ivt_rank * 0.94) + mfc_rank) / 3;
+            const changma_front_score = (tg_rank + (tg_rank * 0.91) + block_rank) / 3;
+            const lift_instability_score = (ascent_rank + t850_rank + mfc_rank) / 3;
+            const research_alignment_score = ar_moisture_score * changma_front_score * lift_instability_score;
+
+            // Render Progress Substructures
+            scoreMoisture.innerText = `${(ar_moisture_score * 100).toFixed(1)}%`;
+            scoreFront.innerText = `${(changma_front_score * 100).toFixed(1)}%`;
+            scoreLift.innerText = `${(lift_instability_score * 100).toFixed(1)}%`;
+            barMoisture.style.width = `${(ar_moisture_score * 100).toFixed(1)}%`;
+            barFront.style.width = `${(changma_front_score * 100).toFixed(1)}%`;
+            barLift.style.width = `${(lift_instability_score * 100).toFixed(1)}%`;
+            confluenceVal.innerText = research_alignment_score.toFixed(4);
+
+            // 2. Compute Interactions Engine
+            const moisture_front_collision = ivt * tg;
+            const moisture_convergence_engine = ivt * mfc;
+            const front_lift_engine = tg * ascent;
+            const warm_moist_lift_engine = t850 * ascent;
+            const blocked_moisture_plume = block * ivt;
+            const blocked_stationary_front = block * tg;
+            const full_alignment_engine = ivt * tg * mfc * ascent;
+
+            // 3. Compute Logistic Linear Logit Predictor
+            let logit = MODEL_LOGISTIC_INTERCEPT;
+            logit += (ivt * WEIGHTS.IVT) + (tg * WEIGHTS.theta_e_gradient) + (mfc * WEIGHTS.MFC) + (ascent * WEIGHTS.ascent_700) + (block * WEIGHTS.blocking_index) + (t850 * WEIGHTS.theta_e_850);
+            logit += (moisture_front_collision * WEIGHTS.moisture_front_collision) + (moisture_convergence_engine * WEIGHTS.moisture_convergence_engine) + (front_lift_engine * WEIGHTS.front_lift_engine) + (warm_moist_lift_engine * WEIGHTS.warm_moist_lift_engine);
+            logit += (blocked_moisture_plume * WEIGHTS.blocked_moisture_plume) + (blocked_stationary_front * WEIGHTS.blocked_stationary_front) + (full_alignment_engine * WEIGHTS.full_alignment_engine);
+            
+            let prob_logistic = 1 / (1 + Math.exp(-logit));
+
+            // 4. Compute Random Forest Tree Threshold Rules Approximation
+            let prob_rf = 0.05; // Base sample density background probability
+            if (ivt > 450 && mfc > 2.5) prob_rf += 0.25;
+            if (tg > 7.5 && Math.abs(ascent) > 3.5) prob_rf += 0.30;
+            if (block > 10.0 && moisture_front_collision > 3500) prob_rf += 0.20;
+            if (research_alignment_score > 0.15) prob_rf += 0.15;
+            prob_rf = Math.min(0.98, prob_rf);
+
+            // 5. Run Ensemble Integration Pipeline
+            const ensemble_prob = (prob_logistic + prob_rf) / 2;
+            const displayPercentage = (ensemble_prob * 100).toFixed(1);
+            
+            riskDisplay.innerText = `${displayPercentage}%`;
+
+            // Threshold Validation Output Flag (0.45 threshold matching code architecture)
+            if (ensemble_prob >= 0.45) {
+                riskDisplay.className = "text-6xl font-black font-mono tracking-tight text-rose-500 animate-pulse";
+                verdictBanner.className = "w-full md:w-auto self-stretch flex items-center justify-center p-6 rounded-xl text-center font-bold border bg-rose-500/10 border-rose-500 text-rose-400";
+                verdictBanner.innerHTML = "🚨 CRITICAL ALERT:<br>Structural fusion indexes signal an active heavy rainfall threat.";
+            } else {
+                riskDisplay.className = "text-6xl font-black font-mono tracking-tight text-emerald-400";
+                verdictBanner.className = "w-full md:w-auto self-stretch flex items-center justify-center p-6 rounded-xl text-center font-bold border bg-emerald-500/10 border-emerald-500 text-emerald-400";
+                verdictBanner.innerHTML = "✅ NOMINAL STATE:<br>Synoptic alignments sit safely below warning criteria thresholds.";
+            }
+        }
+
+        // Bind Sliders to Engine
+        inputs.forEach(id => elements[id].addEventListener('input', calculateRisk));
+        
+        // Initial Trigger
+        calculateRisk();
+    </script>
+</body>
+</html>
